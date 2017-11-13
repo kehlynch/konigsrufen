@@ -1,0 +1,27 @@
+{
+  "name": "konigsrufen-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kehlynch/konigsrufen.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kehlynch/konigsrufen/issues"
+  },
+  "homepage": "https://github.com/kehlynch/konigsrufen#readme",
+  "dependencies": {
+    "next": "^4.1.4",
+    "react": "^16.1.0",
+    "react-dom": "^16.1.0"
+  }
+}
