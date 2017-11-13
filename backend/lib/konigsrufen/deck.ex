@@ -27,12 +27,4 @@ defmodule Konigsrufen.Deck do
     trumps ++ non_trumps
   end
 
-  def get_hands do
-    {talon, hands} = 
-      get_deck()
-      |> Enum.shuffle
-      |> Enum.chunk_every(12, 12, [])
-      |> List.pop_at(-1)
-    %{hands: hands, talon: talon}
-  end
 end
