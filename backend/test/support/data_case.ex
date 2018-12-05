@@ -1,4 +1,4 @@
-defmodule Konigsrufen.DataCase do
+defmodule Kr.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -16,20 +16,32 @@ defmodule Konigsrufen.DataCase do
 
   using do
     quote do
-      alias Konigsrufen.Repo
-
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Konigsrufen.DataCase
+      import Kr.DataCase
+      import Kr.Factory
+      import Kr.Repo.Factory, except: [build: 1]
+
+      alias Kr.Repo
+      alias Kr.{Games, Settings, Stores}
+      alias Kr.Stores.Store
+
+      setup do
+        user = insert(:user)
+        %Store{id: store_id} = Stores.create_store!(%{user_id: user.id})
+        pid = Settings.start_link(store_id)
+        Games.init_game!(pid)
+        {:ok, pid: pid}
+      end
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Konigsrufen.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Kr.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Konigsrufen.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Kr.Repo, {:shared, self()})
     end
 
     :ok
@@ -49,5 +61,19 @@ defmodule Konigsrufen.DataCase do
         String.replace(acc, "%{#{key}}", to_string(value))
       end)
     end)
+  end
+
+  def have_same_ids?(list1, list2) when is_list(list1) and is_list(list2) do
+    get_sorted_ids(list1) == get_sorted_ids(list2)
+  end
+
+  defp get_sorted_ids(list) when is_list(list) do
+    list
+    |> Enum.map(&get_id(&1))
+    |> Enum.sort()
+  end
+
+  defp get_id(struct = %{}) do
+    Map.get(struct, :id) || Map.get(struct, "id")
   end
 end

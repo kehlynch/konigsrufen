@@ -6,9 +6,15 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
-      - ./backend:/code
+      - ./backend/lib:/code/lib
+      - ./backend/config:/code/config
+      - ./backend/test:/code/test
+      - ./backend/priv:/code/priv
+      - ./backend/assets/css:/code/assets/css
+      - ./backend/assets/js:/code/assets/js
+      - ./backend/assets/static:/code/assets/static
     ports:
-      - 4000:4000
+      - 4008:4000
     tty: true
     depends_on:
       - postgres
@@ -21,9 +27,13 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./frontend:/code
+      - ./frontend/components:/code/components
+      - ./frontend/lib:/code/lib
+      - ./frontend/pages:/code/pages
+      - ./frontend/static:/code/static
+      - ./frontend/types:/code/types
     ports:
-      - 3000:3000
+      - 3008:3000
     tty: true
     depends_on:
       - backend
@@ -36,4 +46,4 @@ services:
     environment:
       POSTGRES_PASSWORD: password
     ports:
-      - 5432:5432
+      - 5438:5432

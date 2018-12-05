@@ -2,7 +2,7 @@ use Mix.Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :konigsrufen, KonigsrufenWeb.Endpoint,
+config :kr, KrWeb.Endpoint,
   http: [port: 4001],
   server: false
 
@@ -10,10 +10,10 @@ config :konigsrufen, KonigsrufenWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :konigsrufen, Konigsrufen.Repo,
+config :kr, Kr.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "password",
-  database: "konigsrufen_test",
+  database: "kr_test",
   hostname: "postgres",
   pool: Ecto.Adapters.SQL.Sandbox

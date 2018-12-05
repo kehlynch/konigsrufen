@@ -1,4 +1,4 @@
-defmodule KonigsrufenWeb.ConnCase do
+defmodule KrWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -19,20 +19,31 @@ defmodule KonigsrufenWeb.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
-      import KonigsrufenWeb.Router.Helpers
+      import KrWeb.Router.Helpers
+      import Kr.DataCase
+      import Kr.Factory
+      import Kr.Repo.Factory, except: [build: 1]
 
       # The default endpoint for testing
-      @endpoint KonigsrufenWeb.Endpoint
+      @endpoint KrWeb.Endpoint
+
+      @username Application.get_env(:kr, :basic_auth)[:username]
+      @password Application.get_env(:kr, :basic_auth)[:password]
+
+      def authenticate_admin_request(conn) do
+        header_content = "Basic " <> Base.encode64("#{@username}:#{@password}")
+        conn |> put_req_header("authorization", header_content)
+      end
     end
   end
-
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Konigsrufen.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Kr.Repo)
+
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Konigsrufen.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Kr.Repo, {:shared, self()})
     end
+
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
-
 end

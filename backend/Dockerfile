@@ -1,30 +1,29 @@
-FROM ubuntu:14.04
-ENV DEBIAN_FRONTEND=noninteractive
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+FROM bitwalker/alpine-elixir:1.6.6
 
-RUN apt-get update -qq && apt-get install -y build-essential
+RUN apk update
+RUN apk add --virtual \
+  build-dependencies \
+  build-base
 
-COPY makedeps/shared /code/makedeps/shared
+RUN apk add \
+  "bash" \
+  "nodejs" \
+  "npm" \
+  "inotify-tools" \
+  "openssl"
 
-COPY makedeps/base-build /code/makedeps/base-build
-RUN cd /code/makedeps/base-build && make base-repos base-build-deps
+EXPOSE 4000
+ENV PORT=4000
 
-COPY makedeps/postgres /code/makedeps/postgres
-RUN cd /code/makedeps/postgres && make postgres-repos postgres-build-deps
-
-COPY makedeps/node /code/makedeps/node
-RUN cd /code/makedeps/node && make node-repos node-build-deps
-
-COPY makedeps/elixir /code/makedeps/elixir
-RUN cd /code/makedeps/elixir && make elixir-repos elixir-build-deps
-
-RUN locale-gen en_GB.UTF-8
-ENV LANG en_GB.UTF-8
-ENV LANGUAGE en_GB:en
-ENV LC_ALL en_GB.UTF-8
-
-COPY . /code
+# Copy code to install deps
+# lib,config,test,assets(some) folders are mounted for development
+COPY ./ /code
 WORKDIR /code
 
-COPY mix.exs mix.lock /code/
-CMD make elixir-setup && make node-setup && /bin/bash
+# Install dependencies to the container
+RUN make elixir-install
+# package.json is copied, and node modules can install in the container
+# Make sure there is no node_modules in the host's folder (or it will be copied with wrong arch)
+RUN make node-install
+
+CMD /bin/bash

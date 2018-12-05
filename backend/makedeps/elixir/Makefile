@@ -40,8 +40,8 @@ elixir-release:
 elixir-preserve-release:
 	mkdir -p "/artifacts/elixir"
 	cp -R /code/rel/* "/artifacts/elixir"
-	mkdir -p "/artifacts/elixir/konigsrufen/releases/0.1.0/priv"
-	cp -R "/code/apps/backend/priv/static" "/artifacts/elixir/konigsrufen/releases/0.1.0/priv"
+	mkdir -p "/artifacts/elixir/kr/releases/0.1.0/priv"
+	cp -R "/code/apps/backend/priv/static" "/artifacts/elixir/kr/releases/0.1.0/priv"
 
 elixir-install-release:
 	mkdir -p "/app"

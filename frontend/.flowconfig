@@ -11,4 +11,8 @@
 
 [options]
 
+emoji=true
+include_warnings=true
+suppress_comment= \\(.\\|\n\\)*\\$FlowIgnore
+
 [strict]

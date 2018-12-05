@@ -1,16 +1,17 @@
-defmodule Konigsrufen.Mixfile do
+defmodule Kr.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :konigsrufen,
+      app: :kr,
       version: "0.0.1",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       start_permanent: Mix.env == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [plt_add_apps: [:mix]]
     ]
   end
 
@@ -19,7 +20,7 @@ defmodule Konigsrufen.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Konigsrufen.Application, []},
+      mod: {Kr.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -33,7 +34,7 @@ defmodule Konigsrufen.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.3.0"},
+      {:phoenix, "~> 1.3.1"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
       {:postgrex, ">= 0.0.0"},
@@ -41,7 +42,10 @@ defmodule Konigsrufen.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:roman_numerals, github: "DevL/roman-numerals-elixir", ref: "master", override: true},
+      {:plug_cowboy, "~> 1.0"}.,
+      {:corsica, "~> 1.0"},
+      {:ex_machina, "~> 2.1", only: :test},
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}
     ]
   end
 
