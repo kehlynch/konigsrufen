@@ -1,7 +1,7 @@
 defmodule KrWeb.API.ResponseControllerTest do
 
   use KrWeb.ConnCase
-  alias Kr.{Cards, Games, Hands, Settings, Store, Stores}
+  alias Kr.{Games, Hands, Settings, Store, Stores}
 
   setup do
     user = insert(:user)
@@ -13,30 +13,28 @@ defmodule KrWeb.API.ResponseControllerTest do
 
   describe "create" do
     test "applies response", %{conn: conn, pid: pid, store_id: store_id} do
-      hand = Hands.build_hand([Cards.get_card(:diamond_7)])
-      Hands.set_hand!(pid, :p1, hand)
+      card_slug =
+        pid
+        |> Hands.get_hand(:p1)
+        |> Map.values()
+        |> List.flatten()
+        |> Enum.random()
+        |> Map.get(:slug)
 
-      Process.sleep(200)
-
-      conn = post(conn, api_response_path(conn, :create), %{card_slug: "diamond_7", player: "p1", game_id: store_id})
+      conn = post(conn, api_response_path(conn, :create), %{card_slug: card_slug, player: "p1", game_id: store_id})
       assert body = json_response(conn, 200)
 
-      returned_diamonds =
+      returned_trick =
         body
         |> Map.get("game")
-        |> Map.get("hands")
-        |> Map.get("p1")
-        |> Map.get("diamonds")
+        |> Map.get("tricks")
+        |> Enum.at(0)
+        |> Enum.find(fn played_card ->
+          Map.get(played_card, "player") === "p1"
+        end)
 
-      assert returned_diamonds === []
-
-      returned_current_trick =
-        body
-        |> Map.get("game")
-        |> Map.get("trick")
-        |> Map.get("p1")
-
-      assert %{"slug" => "diamond_7"} = returned_current_trick
+      slug_string = Atom.to_string(card_slug)
+      assert %{"slug" => ^slug_string} = returned_trick
     end
   end
 end

@@ -5,6 +5,9 @@ defmodule Kr.Settings do
   alias Kr.Stores
   alias Kr.Settings.Helpers
 
+  @type value() :: map() | list() | integer() | binary() | atom() | float()
+  @type path() :: list() | integer() | binary() | atom()
+
   # GenServer callbacks
 
   def init(store_id) do
@@ -52,16 +55,19 @@ defmodule Kr.Settings do
   end
 
   ### API
-  
+
+  @spec start_link(integer()) :: pid()
   def start_link(store_id) do
     {:ok, pid} = GenServer.start_link(__MODULE__, store_id)
     pid
   end
 
+  @spec get_setting(pid(), path(), value()) :: value()
   def get_setting(pid, path, default \\ nil) do
     GenServer.call(pid, {:get, path, default})
   end
 
+  @spec update_setting!(pid(), path(), value()) :: :ok
   def update_setting!(pid, path, value) when is_map(value) do
     new_value =
       pid
@@ -84,10 +90,12 @@ defmodule Kr.Settings do
     set_setting!(pid, path, value)
   end
 
+  @spec set_setting!(pid(), path(), value()) :: :ok
   def set_setting!(pid, path, value) do
     GenServer.cast(pid, {:set, path, value})
   end
 
+  @spec increment_setting!(pid(), path(), value()) :: :ok
   def increment_setting!(pid, path, value) when is_number(value) do
     new_value =
       pid

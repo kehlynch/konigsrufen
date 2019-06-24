@@ -11,6 +11,7 @@ defmodule KrWeb.API.CardView do
     |> Map.put(:suit, card.suit)
     |> Map.put(:value, card.value)
     |> Map.put(:points, card.points)
+    |> Map.put(:legal, Map.get(card, :legal))
   end
 
   def render_card(nil), do: nil

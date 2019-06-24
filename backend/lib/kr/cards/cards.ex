@@ -1,14 +1,27 @@
 defmodule Kr.Cards do
+  alias Kr.Players
+
   @type slug() :: atom()
   @type suit() :: atom()
   @type value() :: integer()
   @type points() :: integer()
 
-  @type card() :: %{
+  @type card() ::%{
     required(:slug) => slug(),
     required(:suit) => suit(),
     required(:value) => value(),
-    required(:points) => points()
+    required(:points) => points(),
+    required(:legal) => boolean()
+  }
+
+  @type playedcard() :: %{
+    required(:slug) => slug(),
+    required(:suit) => suit(),
+    required(:value) => value(),
+    required(:points) => points(),
+    required(:legal) => boolean(),
+    required(:player) => Players.player(),
+    required(:winning) => boolean()
   }
 
   @type cardlist() :: list(card())
@@ -33,6 +46,7 @@ defmodule Kr.Cards do
     |> Map.put(:suit, suit)
     |> Map.put(:value, value)
     |> Map.put(:points, get_points(suit, value))
+    |> Map.put(:legal, true)
   end
 
   @spec get_card(slug() | nil) :: card() | nil
@@ -47,6 +61,7 @@ defmodule Kr.Cards do
     |> Map.put(:suit, suit)
     |> Map.put(:value, value)
     |> Map.put(:points, get_points(suit, value))
+    |> Map.put(:legal, true)
   end
 
   @spec get_points(suit(), value()) :: points()
@@ -84,5 +99,22 @@ defmodule Kr.Cards do
     |> String.split("_")
     |> Enum.at(1)
     |> String.to_integer()
+  end
+
+  @doc """
+    Does card2 beat card1?
+  """
+  @spec beats?(playedcard(), playedcard()) :: boolean()
+  def beats?(c1, c2) do
+    case {c1.suit, c2.suit} do
+      {s1, s2} when s1 === s2 -> c2.value > c1.value
+      {_s1, :trump} -> true
+      _ -> false
+    end
+  end
+
+  @spec add_legal(card(), boolean()) :: card()
+  def add_legal(card, legal) do
+    Map.put(card, :legal, legal)
   end
 end

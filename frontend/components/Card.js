@@ -3,23 +3,34 @@
 import React from "react";
 
 import Button from "./Button";
-import type { CardType } from "../types/card";
+import type { CardType, PlayedCardType } from "../types/card";
 
 type Props = {
-  card: CardType,
-  position: string,
+  card: CardType | PlayedCardType,
   setSelectedCard?: Function,
   playCard?: Function,
+  landscape: boolean,
   selected?: boolean,
-  hidden?: boolean
+  hidden?: boolean,
+  small?: boolean
 };
+
+const BASE_HEIGHT_VH = 10;
+const BASE_WIDTH_VH = BASE_HEIGHT_VH * (50/94)
 
 class Card extends React.Component<Props> {
   getImage() {
-    const { card, hidden } = this.props;
-    const path = hidden
-      ? `/static/img/back.jpg`
-      : `/static/img/${card.slug}.jpg`;
+    const { card, hidden, landscape } = this.props;
+    var path;
+    if (hidden && landscape) {
+      path = `/static/img/back_landscape.jpg`
+    } else if (landscape) {
+      path = `/static/img/${card.slug}_landscape.jpg`;
+    } else if (hidden) {
+      path = `/static/img/back.jpg`
+    } else {
+      path = `/static/img/${card.slug}.jpg`;
+    }
     return path;
   }
 
@@ -36,31 +47,42 @@ class Card extends React.Component<Props> {
   };
 
   render() {
-    const { card, position, selected } = this.props;
+    const { card, landscape, selected, small } = this.props;
+
+    var width;
+    var height;
+
+    if (landscape) {
+      width = small ? BASE_HEIGHT_VH/2 : BASE_HEIGHT_VH;
+      height = small ? BASE_WIDTH_VH/2 : BASE_WIDTH_VH;
+    } else {
+      width = small ? BASE_WIDTH_VH/2 : BASE_WIDTH_VH;
+      height = small ? BASE_HEIGHT_VH/2 : BASE_HEIGHT_VH;
+    }
 
     return (
-      <div className={`card ${position} ${selected ? "selected" : ""}`}>
+      <div className={`card ${selected ? "selected" : ""}`}>
         <style jsx>{`
           .card {
-            width: 50px;
-            height: 94px;
+            width: ${width}vh;
+            height: ${height}vh;
           }
           .card.selected {
-            width: 100px;
-            height: 188px;
+            width: ${width * 2}vh;
+            height: ${height * 2}vh;
             z-index: 10;
             align-items: center;
             display: flex;
             flex-direction: column;
             position: relative;
           }
-          
           .image {
             width: 100%;
             height: auto;
             border: 1px solid black;
             border-radius: 5px;
             object-fit: cover;
+            border-color: ${!card.legal && selected ? "red" : "black"};
           }
           .play {
             position: absolute;
@@ -71,13 +93,13 @@ class Card extends React.Component<Props> {
         `}</style>
         <img
           src={this.getImage()}
-          className={`image ${position} ${selected ? "selected" : ""}`}
+          className={`image ${selected ? "selected" : ""}`}
           id={card.slug}
           onClick={this.select}
         />
         {selected && (
           <div className="play">
-            <Button text="play" onClick={this.play} type="play" small />
+            <Button text="play" onClick={this.play} type="play" disabled={!card.legal} small />
           </div>
         )}
       </div>

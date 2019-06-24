@@ -22,6 +22,14 @@ defmodule Kr.Stores do
     |> Repo.insert!()
   end
 
+  def get_or_create_store!(%{id: id}) do
+    get_store!(id)
+  end
+
+  def get_or_create_store!(attrs) do
+    create_store!(attrs)
+  end
+
   def update_store!(%Store{} = store, attrs) do
     store
     |> Store.changeset(attrs)

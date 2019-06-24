@@ -3,14 +3,20 @@ export type CardType = {|
   slug: string,
   suit: string,
   points: number,
-  value: number
+  value: number,
+  legal?: boolean
 |};
 
-export type CardListType = Array<CardType>;
+export type PlayedCardType = {|
+  slug: string,
+  suit: string,
+  points: number,
+  value: number,
+  legal: boolean,
+  player: string,
+  winning: boolean,
+  show?: boolean
+|}
 
-export const EMPTY_CARD: CardType = {
-  slug: "",
-  suit: "",
-  points: 0,
-  value: 0
-};
+export type CardListType = Array<CardType>;
+export type PlayedCardListType = Array<PlayedCardType>;

@@ -5,28 +5,53 @@ defmodule Kr.Games do
     Hands,
     NPC,
     Players,
+    Scores,
     Settings,
     Tricks
   }
 
+  @type points() :: %{required(Players.player()) => integer()}
+
   @type game() :: %{
+    optional(:finished) => boolean,
     required(:hands) => Hands.hands(),
     required(:talon) => Cards.cardlist(),
-    optional(:current_trick) => Tricks.trick(),
-    optional(:tricks) => Tricks.tricks(),
-    optional(:played) => Players.playerlist()
+    required(:tricks) => Tricks.tricks(),
+    optional(:played) => Players.playerlist(),
+    optional(:scores) => Scores.scores(),
+    optional(:points) => points()
   }
 
   @human_player :p1
 
   @spec init_game!(pid()) :: :ok
   def init_game!(pid) do
-    Settings.update_setting!(pid, :game, Decks.deal())
+    game = 
+      Decks.deal()
+      |> Map.put(:tricks, Tricks.get_tricks(pid))
+    Settings.update_setting!(pid, :game, game)
+    Hands.add_legal!(pid)
   end
 
   @spec get_game(pid()) :: game()
   def get_game(pid) do
-    Settings.get_setting(pid, :game)
+    Hands.add_legal!(pid)
+    Settings.get_setting(pid, :game) |> IO.inspect
+  end
+
+  @spec set_finished!(pid()) :: :ok
+  def set_finished!(pid) do
+    Settings.set_setting!(pid, [:game, :finished], true)
+  end
+
+  @spec finished?(pid()) :: :ok
+  def finished?(pid) do
+    Settings.get_setting(pid, [:game, :finished], false)
+  end
+
+  @spec set_points!(pid(), points()) :: :ok
+  def set_points!(pid, points) do
+    Settings.set_setting!(pid, [:game, :points], points)
   end
 
   @spec apply_card_played!(pid(), Players.player(), Cards.slug() | Cards.card()) :: no_return()
@@ -46,14 +71,17 @@ defmodule Kr.Games do
 
   @spec advance_game!(pid()) :: :ok
   def advance_game!(pid) do
-    case Players.get_next_player(pid) do
-      # time to ask the human
-      @human_player -> :ok
-      # 4 cards have been played
-      nil -> :ok
-      player ->
-        card = NPC.get_card(pid, player)
-        apply_card_played!(pid, player, card)
+    IO.puts("advance-game")
+    if !finished?(pid) |> IO.inspect do
+      case Players.get_next_player(pid) do
+        # time to ask the human
+        @human_player ->
+          Hands.add_legal!(pid, @human_player)
+          :ok
+        player ->
+          card = NPC.get_card(pid, player)
+          apply_card_played!(pid, player, card)
+      end
     end
   end
 end

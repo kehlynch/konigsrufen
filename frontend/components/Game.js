@@ -1,17 +1,19 @@
 // @flow
 
 import React from "react";
+import Router from "next/router";
 
-import Header from "./Header";
+import Board from "./board/Board";
 import Hand from "./Hand";
 import HiddenHand from "./HiddenHand";
-import Board from "./Board";
+import Menu from "./Menu";
+import ScoreBoard from "./ScoreBoard";
+
 import mediaQueries from "../lib/mediaQueries";
 
 import type { GameType } from "../types/game";
 import type { HandType } from "../types/hand";
 import type { CardType } from "../types/card";
-import { EMPTY_CARD } from "../types/card";
 
 type State = {
   game: GameType,
@@ -29,16 +31,52 @@ class Game extends React.Component<Props, State> {
     this.state = {
       game: props.game,
       message: null,
-      card: EMPTY_CARD,
+      card: null,
       selectedCard: null
     };
   }
 
   setGame = (game: GameType) => {
-    this.setState((state: State) => ({
-      ...state,
-      game: game
-    }));
+    console.log("setGame", game);
+    const newUrl = {
+      pathname: "/main",
+      query: {
+        game_id: game.id
+      },
+      shallow: true
+    };
+
+    const href = `/main?game_id=${game.id}`;
+    const as = href;
+
+    console.log("setting state...")
+    this.setState((state: State) => {
+        return {
+          ...state,
+          game: game
+        };
+      },
+      () => {
+        console.log("router replace");
+        Router.replace(href, as, { shallow: true });
+      }
+    );
+
+      // this.setState((state: State) => {
+      //   const { response } = state;
+      //   const newResponse = {
+      //     slug: area.slug,
+      //     response_type: "area",
+      //     options: response.options,
+      //     text: response.text
+      //   };
+
+      //   newResponse[field] = fieldValue;
+      //   return {
+      //     ...state,
+      //     response: newResponse
+      //   };
+      // }, this.submitResponseIfSelect);
   };
 
   setMessage = (message: string) => {
@@ -62,7 +100,7 @@ class Game extends React.Component<Props, State> {
     }));
   };
 
-  renderHand(hand: HandType, position: string) {
+  renderHand(hand: HandType) {
     const { game, selectedCard } = this.state;
 
     return (
@@ -73,7 +111,6 @@ class Game extends React.Component<Props, State> {
         setMessage={this.setMessage}
         setSelectedCard={this.setSelectedCard}
         selectedCard={selectedCard}
-        position={position}
       />
     );
   }
@@ -83,36 +120,53 @@ class Game extends React.Component<Props, State> {
   }
 
   render() {
+    console.log("render Game", this.props, this.state);
     const { game, message } = this.state;
-    const { hands, talon, trick } = game;
+    const { scoresList, finished } = game;
+    const { hands } = game;
     const { p1, p2, p3, p4 } = hands;
-
-    console.log(game.trick);
 
     return (
       <div className="game" onClick={this.removeSelection}>
         <style jsx>{`
           .game {
-            margin: 50px;
+            // margin: 50px;
+            display: flex;
+            flex-direction: row;
+            align-items: space-between;
           }
-          .p4 {
+          .menuContainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+          }
+          .mainContainer {
+            display: flex;
+            flex-direction: column;
+            flex: 3;
+          }
+          .scoresContainer {
+            flex: 1;
+          }
+          .n, .s {
             display: flex;
             flex-direction: row;
             justify-content: center;
           }
-          .p23 {
+          .n {
+            height: 20vh;
+          }
+          .s {
+            height: 30vh;
+          }
+          .ew {
+            flex: 3;
             display: flex;
             flex-direction: row;
             justify-content: center;
             align-items: center;
           }
-          .p3 {
-            flex-direction: row;
-          }
-          .p2 {
-            flex-direction: row;
-          }
-          .p1 {
+          .w {
             display: flex;
             flex-direction: row;
             justify-content: center;
@@ -120,14 +174,23 @@ class Game extends React.Component<Props, State> {
           @media ${mediaQueries.gtSmall} {
           }
         `}</style>
-        <Header game={game} message={message} />
-        <div className="p4">{this.renderHiddenHand(p4, "n")}</div>
-        <div className="p23">
-          <div className="p3">{this.renderHiddenHand(p3, "w")}</div>
-          <Board trick={trick} talon={talon} />
-          <div className="p2">{this.renderHiddenHand(p2, "e")}</div>
+        <div className="menuContainer">
+          <Menu setGame={this.setGame} game={game} message={message} />
         </div>
-        <div className="p1">{this.renderHand(p1, "s")}</div>
+        <div className="mainContainer">
+          <div className="n">
+            {this.renderHiddenHand(p3, "n")}
+          </div>
+          <div className="ew">
+            <div className="w">{this.renderHiddenHand(p4, "w")}</div>
+            <Board game={game} />
+            <div className="e">{this.renderHiddenHand(p2, "e")}</div>
+          </div>
+          <div className="s">{this.renderHand(p1)}</div>
+        </div>
+        <div className="scoresContainer">
+          {finished && <ScoreBoard scoresList={scoresList} />}
+        </div>
       </div>
     );
   }

@@ -1,10 +1,6 @@
 // @flow
 
-import type { CardType } from "./card";
+import type { PlayedCardListType } from "./card";
 
-export type TrickType = {|
-  p1: ?CardType,
-  p2: ?CardType,
-  p3: ?CardType,
-  p4: ?CardType
-|}
+export type TrickType = PlayedCardListType;
+export type TricksType = Array<TrickType>;

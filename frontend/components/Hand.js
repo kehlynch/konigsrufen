@@ -13,8 +13,7 @@ type Props = {
   setGame: Function,
   setMessage: Function,
   setSelectedCard: Function,
-  selectedCard: ?CardType,
-  position: string
+  selectedCard: ?CardType
 };
 
 class Hand extends React.Component<Props> {
@@ -30,7 +29,7 @@ class Hand extends React.Component<Props> {
   };
 
   render() {
-    const { hand, setSelectedCard, position, selectedCard } = this.props;
+    const { hand, setSelectedCard, selectedCard } = this.props;
     const { trumps, spades, hearts, clubs, diamonds } = hand;
 
     const suits = [trumps, spades, hearts, clubs, diamonds].filter(
@@ -38,38 +37,33 @@ class Hand extends React.Component<Props> {
     );
 
     return (
-      <div className={`hand ${position}`}>
+      <div className={`hand`}>
         <style jsx>{`
           .hand {
             display: flex;
             flex-direction: row;
-          }
-          .hand.s {
             margin-top: 75px;
           }
           .suit {
             display: flex;
             flex-direction: column;
             align-items: center;
-          }
-          .suit.s {
             margin-right: 5px;
             margin-left: 5px;
           }
-          .cardContainer.s {
-            margin-top: -75px;
+          .cardContainer {
+            margin-top: -55px;
           }
         `}</style>
         {suits.map((cardlist: CardListType, i: number) => (
-          <div className={`suit ${position}`} key={i}>
+          <div className={`suit`} key={i}>
             {cardlist.map(card => (
-              <div className={`cardContainer ${position}`} key={card.slug}>
+              <div className={`cardContainer`} key={card.slug}>
                 <Card
                   card={card}
                   playCard={this.playCard}
                   setSelectedCard={setSelectedCard}
                   selected={selectedCard === card}
-                  position={position}
                 />
               </div>
             ))}

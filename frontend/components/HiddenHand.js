@@ -11,7 +11,31 @@ type Props = {
   position: string
 };
 
+const OVERLAP = 25;
+
 class HiddenHand extends React.Component<Props> {
+  renderCard(index, card) {
+    const { position } = this.props;
+    const landscape = position === "e" || position === "w";
+
+    return (
+      <div className={`card ${position}`}>
+        <style jsx>{`
+          .cardContainer.n {
+            margin-left: -${OVERLAP}px;
+          }
+          .cardContainer.e,
+          .cardContainer.w {
+            margin-top: -${OVERLAP}px;
+          }
+        `}</style>
+        <div className={`cardContainer ${position}`} key={card.slug}>
+          <Card key={card.slug} card={card} landscape={landscape} hidden />
+        </div>
+      </div>
+    );
+
+  }
   render() {
     const { hand, position } = this.props;
 
@@ -31,45 +55,30 @@ class HiddenHand extends React.Component<Props> {
         <style jsx>{`
           .hand {
             display: flex;
+            margin: 20px;
+            width: 10vh;
           }
           .hand.n {
-            margin-left: 25px;
+            margin-left: ${OVERLAP}px;
             align-items: flex-end;
             flex-direction: row-reverse;
-            margin-left: 25px;
+            justify-content: center;
           }
           .hand.e,
           .hand.w {
-            margin-top: 75px;
+            margin-top: ${OVERLAP}px;
           }
           .hand.e {
-            margin-left: 20px;
             flex-direction: column-reverse;
           }
           .hand.w {
-            margin-right: 20px;
             flex-direction: column;
-            align-items: flex-end;
-          }
-          .cardContainer.n {
-            margin-left: -25px;
-          }
-          .cardContainer.e {
-            transform: rotate(90deg);
-          }
-          .cardContainer.w {
-            transform: rotate(-90deg);
-          }
-          .cardContainer.e,
-          .cardContainer.w {
-            margin-top: -75px;
+            align-items: center;
+            display: flex;
+            flex: 1;
           }
         `}</style>
-        {cards.map(card => (
-          <div className={`cardContainer ${position}`} key={card.slug}>
-            <Card key={card.slug} card={card} position={position} hidden />
-          </div>
-        ))}
+        {cards.map((card, i) => ( this.renderCard(i, card)))}
       </div>
     );
   }

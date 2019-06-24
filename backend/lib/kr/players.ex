@@ -1,5 +1,5 @@
 defmodule Kr.Players do
-  alias Kr.Settings
+  alias Kr.{Settings, Trick}
 
   @type player :: :p1 | :p2 | :p3 | :p4
   @type playerlist :: list(player())
@@ -13,7 +13,12 @@ defmodule Kr.Players do
 
   @spec set_played!(pid(), atom()) :: :ok
   def set_played!(pid, player) do
-    Settings.update_setting!(pid, [:game, :played], [player])
+    case get_played(pid) do
+      played when length(played) === 3 ->
+        Settings.set_setting!(pid, [:game, :played], [])
+      _ -> 
+        Settings.update_setting!(pid, [:game, :played], [player])
+    end
   end
 
   @spec get_played(pid()) :: list(atom())
@@ -21,21 +26,10 @@ defmodule Kr.Players do
     Settings.get_setting(pid, [:game, :played], [])
   end
 
-  @spec set_lead_player!(pid(), atom()) :: :ok
-  def set_lead_player!(pid, player) do
-    Settings.set_setting!(pid, [:game, :lead_player], player)
-  end
-
-  @spec get_lead_player(pid()) :: atom()
-  def get_lead_player(pid) do
-    Settings.get_setting(pid, [:game, :lead_player])
-  end
-
   @spec do_get_next_player(list(atom), pid()) :: nil | atom()
   defp do_get_next_player(players, pid) when is_list(players) do
     case length(players) do
-      0 -> get_lead_player(pid)
-      4 -> nil
+      n when n in [0, 4] -> Trick.get_lead_player(pid)
       _ ->
         players
         |> List.last()

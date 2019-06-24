@@ -9,11 +9,13 @@ export async function postResponse(
   card: CardType,
   gameId: number
 ) {
-  const returnData = await post(req, `/responses`, {
+  const response = await post(req, `/responses`, {
     game_id: gameId,
     player: "p1",
     card_slug: card.slug
   });
 
-  return returnData;
+  console.log("postResponse response", response);
+
+  return response;
 }

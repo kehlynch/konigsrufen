@@ -3,11 +3,14 @@ defmodule KrWeb.API.TrickView do
 
   alias KrWeb.API.CardView
 
-  def render_trick(%{} = trick) do
-    Map.new()
-    |> Map.put(:p1, CardView.render_card(trick.p1))
-    |> Map.put(:p2, CardView.render_card(trick.p2))
-    |> Map.put(:p3, CardView.render_card(trick.p3))
-    |> Map.put(:p4, CardView.render_card(trick.p4))
+  def render_trick(trick) do
+    Enum.map(trick, &render_played_card(&1))
+  end
+
+  def render_played_card(played_card) do
+    played_card
+    |> CardView.render_card()
+    |> Map.put(:player, played_card.player)
+    |> Map.put(:winning, played_card.winning)
   end
 end

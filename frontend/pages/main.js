@@ -14,10 +14,12 @@ type Context = {
   req: Request,
   res: Object
 };
+
 type Props = {
   game: GameType,
   inventory: boolean
 };
+
 type InitialProps = {
   game: GameType,
   inventory: boolean
@@ -31,6 +33,7 @@ class Main extends React.Component<Props> {
   }: Context): Promise<InitialProps> {
     // try {
     const game = await getGame(req, query.game_id);
+    console.log("getInitialProps")
 
     return {
       game: game,

@@ -5,16 +5,19 @@ import { get, post } from "./api";
 import type { Request } from "express";
 import Router from "next/router";
 
-export async function createGame(req: Request, userId: number) {
-  const returnData = await post(req, `/games`, {
+export async function createGame(req: Request, userId: ?number, id: ?number) {
+  const response = await post(req, `/games`, {
+    id: id,
     user_id: userId
   });
-  return returnData;
+  console.log("createGame response", response);
+  return response;
 }
 
 export async function getGame(req: Request, gameId: string) {
   const url = `/games/${gameId}`;
   const response = await get(req, url);
+  console.log("getGame response", response);
   return response;
 }
 

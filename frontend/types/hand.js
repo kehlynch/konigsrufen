@@ -1,5 +1,5 @@
 // @flow
-import type { CardListType } from "./card";
+import type { CardListType, PlayedCardListType } from "./card";
 
 export type HandType = {|
   trumps: CardListType,

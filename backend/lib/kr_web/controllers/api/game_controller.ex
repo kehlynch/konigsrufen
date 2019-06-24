@@ -24,8 +24,19 @@ defmodule KrWeb.API.GameController do
     render(conn, "show.json", store_id: store_id, game: get_game(store_id))
   end
 
+  def create(conn, %{id: id}) do
+    id
+    |> Stores.get_store!()
+    |> do_create(conn)
+  end
+
   def create(conn, params) do
-    %Store{id: store_id} = Stores.create_store!(params)
+    params
+    |> Stores.create_store!()
+    |> do_create(conn)
+  end
+
+  def do_create(%Store{id: store_id}, conn) do
     pid = Settings.start_link(store_id)
     Games.init_game!(pid)
     render(conn, "show.json", store_id: store_id, game: Games.get_game(pid))
